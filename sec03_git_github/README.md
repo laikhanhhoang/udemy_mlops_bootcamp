@@ -17,29 +17,30 @@
 
 # Git 
 ## Cơ chế hoạt động
-- Git quản lí code theo dòng, theo dõi sự thay đổi của từng dòng văn bản thô, không quan tâm đó là code hay dòng trống.
-- Cơ chế **merge** giữa các branch:
-    - Các **dòng thay đổi** sẽ được **đóng gói kèm context** (3 dòng trên và dưới) tạo thành một **Hunk**. 
-    - Các **Hunk trong cùng branch đè nhau** thì sẽ được **gom lại thành 1 Hunk tổng**.
-    - Khi **merge**, 2 branch sẽ **tìm node graph chung cuối cùng** rồi **mỗi Hunk** sẽ đi **so khớp context** của nó để **thay đổi code bên trong** nếu trùng context.
-    - **Conflict** xảy ra khi hai Hunk đè lên nhau hoặc một người sửa dòng mà người kia dùng làm ngữ cảnh (như đổi tên hàm).
+- Git không quản lý code theo dòng.
+- Git lưu trữ dưới dạng snapshot của toàn bộ file (blob) tại mỗi commit, không theo dõi từng dòng riêng lẻ.
 
-        Ví dụ:
+- Cơ chế diff & merge (mức heuristic):
+    - Khi so sánh hoặc merge, Git chuyển snapshot thành text và áp dụng thuật toán diff (Myers, Histogram).
+    - Các thay đổi được biểu diễn thành các block gọi là Hunk (bao gồm phần thay đổi và một số dòng context xung quanh).
+    - Các thay đổi gần nhau trong cùng một nhánh có thể được gộp lại thành một Hunk lớn hơn.
 
-        - Conflict do trùng vị trí:
-            ```
-            - Gốc (Base): x = 0
-            - Nhánh A:    x = 10  (Sửa dòng 10)
-            - Nhánh B:    x = 20  (Cũng sửa dòng 10)
-            => Conflict: Git không biết chọn 10 hay 20.
-            ```
-        - Conflict do mất ngữ cảnh:
-            ```
-            - Gốc (Base): def ham_cu(): \n    x = 1
-            - Nhánh A:    def ham_moi(): \n    x = 1 (Đổi tên hàm - làm mất context của dòng x=1)
-            - Nhánh B:    def ham_cu(): \n    x = 99 (Sửa logic dòng x=1 dựa trên context là ham_cu)
-            => Conflict: Nhánh B tìm 'ham_cu' để dán x=99 vào nhưng không thấy vì Nhánh A đã đổi tên.
-            ```
+- Cơ chế merge (3-way merge):
+    - Git sử dụng 3 điểm:
+        - Base: commit chung gần nhất.
+        - A: snapshot của branch A.
+        - B: snapshot của branch B.
+    - Git tính diff từ base → A và base → B.
+    - Sau đó áp dụng các thay đổi (hunks) lên base để tạo kết quả merge.
+    - Việc áp dụng dựa trên context, không dựa vào vị trí dòng tuyệt đối.
+
+- Conflict xảy ra khi:
+    - Hai nhánh thay đổi cùng một vùng nội dung (overlap).
+    - Hoặc một bên sửa nội dung mà bên kia dùng làm context.
+
+- Lưu ý:
+    - Git không thực sự theo dõi “dòng” qua thời gian.
+    - Các thao tác như move/reorder thường bị hiểu là delete + add.
 
 - Xử lý **conflict**: Trưởng nhóm phải tự tay nhặt code từ hai phe HEAD và Incoming, sau đó xóa các ký hiệu đánh dấu để cứu code.
 
