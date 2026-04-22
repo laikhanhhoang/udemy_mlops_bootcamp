@@ -34,7 +34,7 @@
     - Sau đó áp dụng các thay đổi (hunks) lên base để tạo kết quả merge.
     - Việc áp dụng dựa trên context, không dựa vào vị trí dòng tuyệt đối.
 
-- Conflict xảy ra khi:
+- Conflict xảy ra khi Hunk từ 2 nhánh bị đè lên nhau:
     - Hai nhánh thay đổi cùng một vùng nội dung (overlap).
     - Hoặc một bên sửa nội dung mà bên kia dùng làm context.
 
