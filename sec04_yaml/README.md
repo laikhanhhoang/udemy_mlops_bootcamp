@@ -1,4 +1,21 @@
-- Quy tắc parse kiểu dữ liệu của PyYAML:
+- Một số đặc điểm về file YAML:
+    - Ưu điểm:
+        - Gọn, ít ký tự rườm rà hơn JSON.
+        - Dễ viết, dễ sửa.
+        - Phù hợp cho file cấu hình dài, nhiều tầng.
+
+    - Nhược điểm:
+        - Rất dễ lỗi nếu **sai thụt lề** (indent).
+        - Vì tự đoán kiểu dữ liệu nên dễ sinh lỗi khó phát hiện.
+        - Mỗi tool có thể đọc hơi khác nhau nên cần hiểu rõ.
+        - Dễ bị lỗi nếu team không thống nhất cách viết.
+
+    - Công dụng:
+        - Dùng để lưu cấu hình (ví dụ: cấu hình server, pipeline, model, CI/CD)
+        - Dễ đọc, gần giống cách con người viết.
+        - Có thể ghi chú bằng `#` nên tiện giải thích trong file.
+
+- Quy tắc parse kiểu dữ liệu của package PyYAML:
 
     | Parsed Type (Python) | Ghi chú | YAML Value| Output (Python)|
     |----------------------|---------|-----------|----------------|
@@ -19,3 +36,4 @@
     | date: 2022-01-10           | datetime.date                | Không phải string |
     | id: 0123                   | int (có thể octal)           | Leading zero |
     | [1, "2", true]             | list[mixed]                  | Dễ crash downstream |
+
