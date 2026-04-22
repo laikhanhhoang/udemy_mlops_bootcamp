@@ -138,11 +138,11 @@ Chia dự án thành nhiều nhánh giúp bạn quản lý code song song và tr
     | **Xem các nhánh chưa được gộp** | `git branch --no-merged` |
 
 - Quy trình gộp nhánh an toàn (Standard Workflow)
-    1. **Chuyển về nhánh đích:** `git checkout main`.
-    2. **Cập nhật code mới nhất từ server:** `git pull origin main`.
-    3. **Gộp nhánh tính năng:** `git merge feature-ocr`.
+    1. **Chuyển về nhánh đích LOCAL:** `git checkout main`.
+    2. **Cập nhật code mới nhất từ server REMOTE:** `git pull origin main`.
+    3. **Gộp nhánh tính năng vào code REMOTE:** `git merge feature-ocr`.
     4. **Xử lý xung đột (nếu có):** Mở file bị báo đỏ, chọn code đúng, sau đó `add` và `commit`.
-    5. **Đẩy code lên server:** `git push origin main`.
+    5. **Đẩy code lên server:** `git push origin main`. Vì lúc này đang là nhánh đích LOCAL nên sẽ được push lên nhánh đích REMOTE.
 
 
 <br><br>
