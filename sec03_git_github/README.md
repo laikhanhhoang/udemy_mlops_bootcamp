@@ -1,16 +1,17 @@
 # 📖 Mục lục
-
-* [**⚙️ Cấu hình hệ thống (Git Configurations)**](#️-git-configurations)
-    * [Thiết lập danh tính (User & Email)](#thiết-lập-danh-tính)
-    * [Quản lý Alias (Gõ tắt chuyên nghiệp)](#quản-lý-alias)
-* [**🌿 Quản lý Nhánh (Branching)**](#-thao-tác-với-branch-và-alias)
-    * [Làm việc với Nhánh Local (Trên máy)](#làm-việc-với-nhánh-local-trên-máy)
-    * [Làm việc với Nhánh Remote (GitHub/Server)](#làm-việc-với-nhánh-remote-githubserver)
-    * [Kiểm tra Trạng thái & Kết nối](#kiểm-tra-trạng-thái--kết-nối)
-* [**🔀 Gộp nhánh (Merge)**](#-gộp-nhánh-merge)
-    * [Các lệnh gộp nhánh phổ biến](#các-lệnh-phổ-biến)
-    * [Quy trình gộp nhánh an toàn](#quy-trình-gộp-nhánh-an-toàn-standard-workflow)
-* [**⬆️ Upload code local có sẵn vào repo Github (mới)**](#đưa-code-local-vào-repo-github)
+* [**Cơ chế hoạt động**](#cơ-chế-hoạt-động)
+* [**Các lệnh thông dụng**](#các-lệnh-thông-dụng)
+    * [**⚙️ Cấu hình hệ thống (Git Configurations)**](#️-git-configurations)
+        * Thiết lập danh tính (User & Email)
+        * Quản lý Alias (Gõ tắt chuyên nghiệp)
+    * [**🌿 Quản lý Nhánh (Branching)**](#-thao-tác-với-branch-và-alias)
+        * Làm việc với Nhánh Local (Trên máy)
+        * Làm việc với Nhánh Remote (GitHub/Server)
+        * Kiểm tra Trạng thái & Kết nối giữa các nhánh Local và Remote
+    * [**🔀 Gộp nhánh (Merge)**](#-gộp-nhánh-merge)
+        * Các lệnh gộp nhánh phổ biến    
+        * Quy trình gộp nhánh an toàn
+    * [**⬆️ Upload code local có sẵn vào repo Github (mới)**](#đưa-code-local-vào-repo-github)
 
 <br><br>
 
