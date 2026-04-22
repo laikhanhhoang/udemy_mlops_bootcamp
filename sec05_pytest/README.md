@@ -6,11 +6,31 @@ Pytest là thư viện dùng để viết và chạy test trong Python, giúp ki
 
 ---
 
+
+## Quy tắc đặt tên
+
+* File: `test_*.py` hoặc `*_test.py`
+* Hàm: bắt đầu bằng `test_`
+
+---
+
 ## Cài đặt
 
 ```bash
 pip install pytest
 ```
+
+---
+
+## Cách chạy test
+
+```bash
+pytest
+```
+
+- Nếu chạy lệnh này trên 1 folder, nó sẽ scan mọi file thỏa mãn quy tắc đặt tên ở trên. 
+- Để chỉ định chạy đúng file duy nhất, thêm file vào sau: **`pytest <tên_file>.py`**.
+- Sau đó nó sẽ scan trong file các hàm có prefix **`test_`** và chạy hàm đó.
 
 ---
 
@@ -26,20 +46,7 @@ def test_add():
 
 ---
 
-## Cách chạy test
 
-```bash
-pytest
-```
-
----
-
-## Quy tắc đặt tên
-
-* File: `test_*.py` hoặc `*_test.py`
-* Hàm: bắt đầu bằng `test_`
-
----
 
 ## Fixture (chuẩn bị dữ liệu)
 
