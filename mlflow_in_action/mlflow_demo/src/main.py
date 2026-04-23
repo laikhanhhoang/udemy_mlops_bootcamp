@@ -1,4 +1,6 @@
 import os
+from pathlib import Path
+
 import warnings
 import argparse
 import logging
@@ -35,11 +37,6 @@ if __name__ == "__main__":
     # Read the wine-quality csv file from local
     data = pd.read_csv("wine_quality.csv")
 
-    # Create 'data' directory if it doesn't exist
-    if not os.path.exists("data"):
-        os.makedirs("data")
-    data.to_csv("data/wine_quality.csv", index=False)
-
     # Split the data into training and test sets. (0.75, 0.25) split.
     train, test = train_test_split(data)
 
@@ -52,11 +49,12 @@ if __name__ == "__main__":
     alpha = args.alpha
     l1_ratio = args.l1_ratio
 
-    exp = mlflow.set_experiment("Elasticnet Wine Quality")
-    # equivalent exp = mlflow.set_experiment(experiment_name="Elasticnet Wine Quality")
+    # Setup MLFlow experiment
 
-    with mlflow.start_run(
-        experiment_id=exp.experiment_id,
+    mlflow.set_tracking_uri("file:///D:/UDEMY/mlops_bc/mlflow_in_action/mlflow_demo/src/mlruns")    
+    mlflow.set_experiment("Elasticnet")
+
+    with mlflow.start_run(        
         run_name=f"alpha_{alpha}_l1_{l1_ratio}"
     ):
 
