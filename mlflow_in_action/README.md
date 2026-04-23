@@ -25,9 +25,6 @@
 
 ## 🛠️ Các loại URI Scheme trong MLflow
 
-Khi cần load lại mô hình để dự báo (Inference), MLflow hỗ trợ các giao thức sau:
-### 🛠️ Các loại URI Scheme trong MLflow
-
 | Scheme | Cách dùng | Ý nghĩa |
 | :--- | :--- | :--- |
 | **`runs:/`** | `runs:/<run_id>/<path>` | Truy cập tài nguyên (artifacts/data) thuộc về một Run cụ thể thông qua ID. |
