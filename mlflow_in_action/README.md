@@ -8,7 +8,7 @@
     | **Runs** | `run_id` (PK) | `experiment_id` (FK), `status`, `start_time`, `end_time`, `lifecycle_stage` | Chi tiết về một phiên chạy huấn luyện cụ thể. |
 
 
-- 📈 **Tracking Data **(Nội dung thực nghiệm): **Lưu trữ các thông số kỹ thuật và kết quả đo lường**.
+- 📈 **Tracking Data** (Nội dung thực nghiệm): **Lưu trữ các thông số kỹ thuật và kết quả đo lường**.
 
     | Bảng | Cột khóa | Các cột khác | Ý nghĩa |
     | :--- | :--- | :--- | :--- |
