@@ -7,6 +7,9 @@ import numpy as np
 from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import ElasticNet
+import mlflow
+import mlflow.sklearn
+from mlflow.models.signature import infer_signature
 
 logging.basicConfig(level=logging.WARN)
 logger = logging.getLogger(__name__)
@@ -49,14 +52,41 @@ if __name__ == "__main__":
     alpha = args.alpha
     l1_ratio = args.l1_ratio
 
-    lr = ElasticNet(alpha=alpha, l1_ratio=l1_ratio, random_state=42)
-    lr.fit(train_x, train_y)
+    exp = mlflow.set_experiment("Elasticnet Wine Quality")
+    # equivalent exp = mlflow.set_experiment(experiment_name="Elasticnet Wine Quality")
 
-    predicted_qualities = lr.predict(test_x)
+    with mlflow.start_run(
+        experiment_id=exp.experiment_id,
+        run_name=f"alpha_{alpha}_l1_{l1_ratio}"
+    ):
 
-    (rmse, mae, r2) = eval_metrics(test_y, predicted_qualities)
+        lr = ElasticNet(alpha=alpha, l1_ratio=l1_ratio, random_state=42)
+        lr.fit(train_x, train_y)
 
-    print("Elasticnet model (alpha={:f}, l1_ratio={:f}):".format(alpha, l1_ratio))
-    print("  RMSE: %s" % rmse)
-    print("  MAE: %s" % mae)
-    print("  R2: %s" % r2)
+        preds = lr.predict(test_x)
+
+        rmse, mae, r2 = eval_metrics(test_y, preds)
+
+        print(f"ElasticNet model (alpha={alpha}, l1_ratio={l1_ratio}):")
+        print(f"  RMSE: {rmse}")
+        print(f"  MAE: {mae}")
+        print(f"  R2: {r2}")
+
+        mlflow.log_param("alpha", alpha)
+        mlflow.log_param("l1_ratio", l1_ratio)
+        mlflow.log_metric("rmse", rmse)
+        mlflow.log_metric("mae", mae)
+        mlflow.log_metric("r2", r2)
+        mlflow.set_tag("model", "ElasticNet")
+        mlflow.set_tag("dataset", "wine_quality")
+
+        signature = infer_signature(train_x, lr.predict(train_x))
+        mlflow.sklearn.log_model(
+            lr,
+            name="model",
+            serialization_format="cloudpickle",
+            signature=signature,
+            input_example=train_x[:5]
+        )
+
+        print(f"Signature of the model: {signature}")
