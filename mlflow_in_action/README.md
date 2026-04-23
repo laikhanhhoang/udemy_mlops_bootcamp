@@ -1,5 +1,9 @@
 # Lí thuyết
-## Chi tiết các bảng trong Database MLFlow
+## Chi tiết các bảng chính trong Database MLFlow
+
+
+
+
 - 📑 **Experiments & Runs**: Quản lý **định danh thí nghiệm và các lần chạy**.
 
     | Bảng | Cột khóa | Các cột khác | Ý nghĩa |
@@ -22,6 +26,9 @@
     | :--- | :--- | :--- | :--- |
     | **Model Registry**| `name`, `version` | `run_id` (FK), `stage`, `creation_time` | Quản lý các phiên bản mô hình đã đăng ký để sẵn sàng deploy. |
 
+<div align="center">
+    <img src="imgs/mlrun_a_db_demo.png" width=1000>
+</div>
 
 ## 🛠️ Các loại URI Scheme trong MLflow
 
