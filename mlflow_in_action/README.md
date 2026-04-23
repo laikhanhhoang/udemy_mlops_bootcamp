@@ -1,6 +1,6 @@
 # Lí thuyết
 ## Chi tiết các bảng trong Database MLFlow
-- 📑 Experiments & Runs: Quản lý định danh và trạng thái của các bộ thực nghiệm.
+- 📑 **Experiments & Runs**: Quản lý **định danh thí nghiệm và các lần chạy**.
 
     | Bảng | Cột khóa | Các cột khác | Ý nghĩa |
     | :--- | :--- | :--- | :--- |
@@ -8,7 +8,7 @@
     | **Runs** | `run_id` (PK) | `experiment_id` (FK), `status`, `start_time`, `end_time`, `lifecycle_stage` | Chi tiết về một phiên chạy huấn luyện cụ thể. |
 
 
-- 📈 Tracking Data (Nội dung thực nghiệm): Lưu trữ các thông số kỹ thuật và kết quả đo lường.
+- 📈 **Tracking Data **(Nội dung thực nghiệm): **Lưu trữ các thông số kỹ thuật và kết quả đo lường**.
 
     | Bảng | Cột khóa | Các cột khác | Ý nghĩa |
     | :--- | :--- | :--- | :--- |
@@ -17,7 +17,7 @@
     | **Tags** | `run_id` (FK) | `key`, `value` | Các nhãn thông tin bổ sung (tên model, loại dataset). |
     | **Artifacts** | `run_id` (FK) | `artifact_path`, `file_type`, `location` | Quản lý các file vật lý (file .pkl, ảnh đồ thị) được lưu trữ. |
 
-- 🏗️ Model Registry: Quản lý vòng đời mô hình khi đưa vào thực tế.
+- 🏗️ **Model Registry**: **Quản lý vòng đời mô hình** khi đưa lên stage.
     | Bảng | Cột khóa | Các cột khác | Ý nghĩa |
     | :--- | :--- | :--- | :--- |
     | **Model Registry**| `name`, `version` | `run_id` (FK), `stage`, `creation_time` | Quản lý các phiên bản mô hình đã đăng ký để sẵn sàng deploy. |
