@@ -28,6 +28,8 @@
 
 <div align="center">
     <img src="imgs/mlrun_a_db_demo.png" width=1000>
+    <br>
+    <i>Demo folder mlruns/ và mlflow.db</i>
 </div>
 
 ## 🛠️ Các loại URI Scheme trong MLflow
