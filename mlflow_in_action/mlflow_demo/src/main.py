@@ -161,7 +161,7 @@ if __name__ == "__main__":
     
     # Define the experiment name to group related runs
     experiment_name = args.exp_name
-    artifact_location = "file:///D:/UDEMY/mlops_bc/mlflow_in_action/mlflow_demo/src/artifacts"
+    artifact_location = "file:///D:/UDEMY/mlops_bc/mlflow_in_action/mlflow_demo/src/artifacts" # Optional: specify where to store artifacts for this experiment
 
     if mlflow.get_experiment_by_name(experiment_name) is None:
         mlflow.create_experiment(experiment_name, artifact_location=artifact_location)
