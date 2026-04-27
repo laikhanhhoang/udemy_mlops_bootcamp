@@ -1,5 +1,7 @@
 .venv/
-local_srv_storage/
 
+local_srv_storage/mlruns/*
+!local_srv_storage/mlruns/.gitkeep
 
-mlflow.db
+local_srv_storage/artifacts/*
+!local_srv_storage/artifacts/.gitkeep
