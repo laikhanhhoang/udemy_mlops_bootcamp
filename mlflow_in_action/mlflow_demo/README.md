@@ -17,7 +17,7 @@ cd ./src/client
 
     ```bash
     cd experiments # Just to make sure you are on folder experiments
-    
+
 
     python exp_elasticnet_gridsearch.py 
         # or python exp_elasticnet_gridsearch.py --nested
@@ -37,6 +37,6 @@ mlflow ui
     #     --default-artifact-root file:///D:/UDEMY/mlops_bc/mlflow_in_action/mlflow_demo/src/local_srv_storage/# artifacts '
     #     --host 127.0.0.1 '
     #     --port 5000
-    # And then go to http http://127.0.0.1:5000 on browser.
+    # And then go to http://127.0.0.1:5000 on browser.
     # This command is for Windows device. If you use Linux, change "'" into "\".
 ```
