@@ -23,7 +23,7 @@ cd ./src/client
         # or python exp_elasticnet_gridsearch.py --nested
     ```
 
-## Setup local MLFlow tracking server in **`src/local_srv_storage`**
+## 3. Setup local MLFlow tracking server in **`src/local_srv_storage`**
 
 ```bash
 cd ./src/local_srv_storage # Just to make sure you are on folder local_srv_storage
