@@ -9,6 +9,13 @@
 - **API log/save:** log_model dùng để lưu vào Tracking Server, trong khi save_model dùng để xuất mô hình ra ổ đĩa cục bộ.
 - **Inference linh hoạt:** Sử dụng load_model kèm theo dst_path để tải và quản lý bản sao mô hình tại máy local.
 
+<br>
+<div align="center">
+    <img src="sec08_modelfolder.png" width=600>
+    <br>
+    <i>Demo folder <b><code>&lt;artifact_location&gt;/&lt;run_id&gt;/artifacts/model/</code></b></i>
+</div>
+
 ## 1. Tổng quan về Model Component
 
 MLflow Model là một định dạng chuẩn hóa để đóng gói các mô hình Machine Learning giúp chúng có thể tái sử dụng trong nhiều công cụ hạ tầng khác nhau (Docker, Spark, Cloud Serving).
@@ -32,7 +39,7 @@ Khi sử dụng lệnh `mlflow.log_model()`, MLflow tạo ra một folder (xem [
 - Hệ thống lưu trữ theo cấu trúc thư mục. Mỗi lần chạy (Run) sẽ có một folder riêng, giúp quản lý phiên bản (versioning) và tránh ghi đè dữ liệu.
 - Thư mục này nằm ở trong folder được định nghĩa ở **`artifact_location`** khi **`create_experiment`**.
     - Ví dụ: `..../artifacts/1ce47b3bc4ca4bb29e6bb104d457ed61/artifacts/model` 
-    - Trong đó: `1ce47b3bc4ca4bb29e6bb104d457ed61` là **`experiment_id`**, `.../artifacts` là **`artifact_location`**.
+    - Trong đó: `1ce47b3bc4ca4bb29e6bb104d457ed61` là **`run_id`**, `.../artifacts` là **`artifact_location`**.
 
 ### 2.2. Model Signature (Hợp đồng dữ liệu)
 - Signature **định nghĩa schema đầu vào và đầu ra** của mô hình.
@@ -50,7 +57,7 @@ Khi sử dụng lệnh `mlflow.log_model()`, MLflow tạo ra một folder (xem [
         # signature = ModelSignature(inputs=input_schema, outputs=output_schema)
     ```
 
-- Khi **inference qua các Flavor**, **Flavor function** kiểm tra các **enforcement rules** được tạo ra từ signature.
+- Khi **inference qua các Flavor**, **Flavor function kiểm tra** các **enforcement rules** được **tạo ra từ signature**.
     - **Enforcement Rules (Quy tắc bắt buộc):**
         - **Name-ordering:** Kiểm tra tên các cột dữ liệu truyền vào.
         - **Input-type:** Kiểm tra kiểu dữ liệu (ví dụ: `int`, `float`, `string`). Nếu truyền sai (ví dụ truyền `string` vào cột `float`), MLflow sẽ báo lỗi ngay lập tức.
