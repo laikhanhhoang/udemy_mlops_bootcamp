@@ -1,5 +1,23 @@
 # Sec07: MLFlow Tracking Server
 
+## Tóm tắt
+* **Kiến trúc tách biệt:** MLflow chia dữ liệu thành **Backend Store** (Metadata nhẹ: params/metrics) và **Artifact Store** (Files nặng: model weights/images).
+* **Lưu trữ linh hoạt:** Hỗ trợ từ quản lý file local đơn giản (`.yaml`) đến các hệ quản trị CSDL chuyên nghiệp (SQLite, PostgreSQL) và Cloud Storage (S3, Azure).
+* **Giao tiếp chuẩn hóa:** Sử dụng **REST API** làm giao thức chính giữa Client và Server; hỗ trợ **Artifact Proxy** để bảo mật thông tin truy cập Cloud.
+* **Các pattern triển khai** 
+    | Nhóm | Mô hình | Backend Store (Metadata) | Artifact Store (Files) | Ưu điểm chính | Phù hợp cho |
+    | :--- | :--- | :--- | :--- | :--- | :--- |
+    | **Local** | **FileStore** | Local Files (`.yaml`) | Local Folder | Zero-config, chạy ngay lập tức. | Người mới bắt đầu, học cấu trúc MLflow. |
+    | **Local** | **SQLite** | `mlflow.db` (SQLite) | Local Folder | Truy vấn nhanh, UI load mượt hơn FileStore. | Cá nhân làm project thực tế trên máy. |
+    | **Local** | **Tracking Server** | `mlflow.db` | Local Folder | Tách biệt logic Code và Server. | Test luồng HTTP trước khi lên Cloud. |
+    | **Remote** | **Standard** | Remote DB (Postgres/MySQL) | S3 / GCS / Azure | Tốc độ upload nhanh (đẩy trực tiếp lên mây). | Nhóm nhỏ, tin tưởng về quyền truy cập. |
+    | **Remote** | **Proxied Access** | Remote DB | S3 / GCS (Ẩn sau Server) | **Bảo mật tuyệt đối**, không lộ Key Cloud cho Client. | Môi trường Production doanh nghiệp lớn. |
+    | **Remote** | **Artifact Proxy** | Không lưu trữ | S3 / GCS / Azure | Chuyên dụng để lưu trữ và quản lý file/model. | Khi đã có hệ thống quản lý Metadata riêng. |
+
+* **Quy trình chuẩn:** Cần thực hiện đủ hai bước **Khởi tạo** (Create) và **Kích hoạt** (Set) Experiment để điều hướng dữ liệu chính xác.
+* **Quản lý tập trung:** Việc sử dụng Server giúp tách biệt môi trường huấn luyện và nơi lưu trữ, hỗ trợ làm việc nhóm và bảo mật Credentials, cho phép hệ thống dễ dàng nâng cấp từ máy cá nhân lên hạ tầng doanh nghiệp mà không cần thay đổi logic code cốt lõi.
+
+
 ## 1. Tracking Server Theory
 
 MLflow Tracking Server đóng vai trò là trung tâm quản lý các thực nghiệm (experiments). Cấu trúc của nó tập trung vào hai mảng chính: Lưu trữ (Storage) và Giao tiếp (Communication).
@@ -145,4 +163,147 @@ Cách thức các thành phần trong hệ sinh thái MLOps tương tác với n
             with mlflow.start_run():
                 mlflow.log_param("env", "local_server")
             ```
+        </details>
+
+### 2.2. Remote 
+
+Khi triển khai thực tế trong doanh nghiệp, MLflow thường được cấu hình dưới dạng **Remote** để hỗ trợ làm việc nhóm và bảo mật dữ liệu. 
+
+- So sánh 3 pattern phổ biến:
+    | Tiêu chí | Standard Remote | Proxied Access | Artifact Proxy Only |
+    | :--- | :--- | :--- | :--- |
+    | **Cấu trúc** | Backend DB & Artifacts riêng. | Backend & Artifacts "giấu" sau Server. | Chỉ đóng vai trò cổng trung chuyển file. |
+    | **Quyền truy cập** | **Client cần Credentials** của Cloud (S3/GCS). | **Client không cần Credentials** của Cloud. | Client chỉ cần kết nối tới Proxy Host. |
+    | **Luồng Artifacts** | Client $\rightarrow$ Cloud Storage (Trực tiếp). | Client $\rightarrow$ MLflow Server $\rightarrow$ Cloud. | Client $\rightarrow$ Proxy Host $\rightarrow$ Storage. |
+    | **Metadata** | Lưu đầy đủ vào DB. | Lưu đầy đủ vào DB. | **Không lưu trữ** Metadata. |
+    | **Trường hợp dùng** | Nhóm nhỏ, ưu tiên tốc độ upload. | Doanh nghiệp ưu tiên bảo mật tuyệt đối. | Chỉ cần dùng MLflow làm kho chứa model. |
+
+
+- **Code setup mẫu**:
+
+    - <details>
+        <summary><b>Pattern 1 - Standard Remote (Client trực tiếp đẩy Artifacts)</b></summary>
+
+        <br>
+
+        Mô hình này yêu cầu máy Client phải cấu hình quyền truy cập Cloud Storage.
+
+        - **Bước 1: Khởi chạy Server (Phía Server - Có giữ Key)**
+
+            ```bash
+            mlflow server \
+                --backend-store-uri sqlite:///mlflow.db \
+                --default-artifact-root s3://my-mlflow-bucket/ \
+                --host 0.0.0.0 \
+                --port 5000
+            ```
+
+        - **Bước 2: Code tại máy Client**
+
+            ```python
+            import mlflow
+            import os
+
+            # 1. Cấu hình xác thực IAM User (Dùng cho máy Client)
+            os.environ["AWS_ACCESS_KEY_ID"] = "your_access_key"
+            os.environ["AWS_SECRET_ACCESS_KEY"] = "your_secret_key"
+            os.environ["AWS_DEFAULT_REGION"] = "ap-southeast-1" # Rất quan trọng để tránh lỗi kết nối
+
+            # 2. Kết nối tới Remote Tracking Server
+            remote_server_url = "http://your-remote-server:5000"
+            mlflow.set_tracking_uri(remote_server_url)
+
+            experiment_name = "Remote_Direct_Cloud"
+
+            # 3. Đảm bảo Experiment tồn tại trên Server trước khi log
+            if mlflow.get_experiment_by_name(experiment_name) is None:
+                # Lưu ý: Với Remote, artifact_location thường do Server định nghĩa sẵn khi khởi chạy
+                mlflow.create_experiment(experiment_name)
+
+            mlflow.set_experiment(experiment_name)
+
+            with mlflow.start_run():
+                mlflow.log_param("access_type", "direct_to_s3")
+                
+                # MLflow sẽ dùng cặp key trong os.environ để đẩy file này thẳng lên S3
+                mlflow.log_artifact("model.pkl")
+            ```
+        </details>
+
+
+    - <details>
+        <summary><b>Pattern 2 - Standard Remote with Proxied Access</b></summary>
+
+        <br>
+
+        Trong mô hình này, **Client KHÔNG cần cài AWS CLI hay giữ Access Key**. Mọi quyền hạn (IAM Role/User) đều được cấu hình tại phía Server.
+
+        - **Bước 1: Khởi chạy Server (Phía Server - Có giữ Key)**
+
+            ```bash
+            # Server giữ Key và chạy với flag --serve-artifacts
+            export AWS_ACCESS_KEY_ID=your_key
+            export AWS_SECRET_ACCESS_KEY=your_secret
+
+            mlflow server \
+                --backend-store-uri sqlite:///mlflow.db \
+                --default-artifact-root s3://my-mlflow-bucket/ \
+                --serve-artifacts \
+                --host 0.0.0.0        
+            ```
+
+
+        - **Bước 2: Code tại máy Client**
+
+            ```python
+            import mlflow
+
+            # Client chỉ cần biết URL của Server, không cần os.environ cho AWS
+            mlflow.set_tracking_uri("http://your-mlflow-server:5000")
+
+            mlflow.set_experiment("Proxied_Access_Experiment")
+
+            with mlflow.start_run():
+                mlflow.log_param("security_level", "high")
+                # File model.pkl sẽ được gửi tới Server qua HTTP, 
+                # rồi Server mới là đứa đẩy nó lên S3 giúp bạn.
+                mlflow.log_artifact("model.pkl")
+            ```
+
+
+
+
+        </details>
+
+    - <details>
+        <summary><b>Pattern 3 - Artifact Proxy Only</b></summary>
+
+        <br>
+
+        - **Bước 1: Khởi chạy Server ở chế độ Artifacts-Only**
+
+            ```bash
+            mlflow server \
+                --artifacts-only \
+                --artifacts-destination s3://my-mlflow-bucket/ \
+                --host 0.0.0.0
+            ```
+
+        - **Bước 2: Code tương tác với Artifacts**
+
+            ```python
+            import mlflow
+            from mlflow.artifacts import log_artifact, download_artifacts
+
+            # Thiết lập URI trỏ thẳng tới proxy host
+            proxy_uri = "http://your-artifact-proxy:5000"
+
+            # Log file mà không cần thông qua một Run cụ thể của Experiment
+            # (Thường dùng cho việc quản lý các bộ Dataset lớn hoặc Model Registry riêng)
+            mlflow.artifacts.log_artifact("data.zip", artifact_path="datasets", run_id=None)
+
+            # Tải file từ kho về máy local
+            download_artifacts(artifact_uri=f"{proxy_uri}/datasets/data.zip", dst_path="./local_data")
+            ```
+
         </details>

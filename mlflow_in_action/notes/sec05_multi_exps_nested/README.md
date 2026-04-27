@@ -22,7 +22,6 @@ with mlflow.start_run(run_name="Parent_Grid_Search"):
                 # ...
 ```
 
-## 3. Log vào Parent Run
 
 ## 3. Log vào Parent Run
 
