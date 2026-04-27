@@ -157,11 +157,11 @@ if __name__ == "__main__":
     # MLFLOW TRACKING SETUP
     # =========================================================================
     # Set the tracking URI (Local file path or Remote server URL)
-    mlflow.set_tracking_uri("file:///D:/UDEMY/mlops_bc/mlflow_in_action/mlflow_demo/src/mlruns")    
+    mlflow.set_tracking_uri("file:///D:/UDEMY/mlops_bc/mlflow_in_action/mlflow_demo/src/local_srv_storage/mlruns")    
     
     # Define the experiment name to group related runs
     experiment_name = args.exp_name
-    artifact_location = "file:///D:/UDEMY/mlops_bc/mlflow_in_action/mlflow_demo/src/artifacts" # Optional: specify where to store artifacts for this experiment
+    artifact_location = "file:///D:/UDEMY/mlops_bc/mlflow_in_action/mlflow_demo/src/local_srv_storage/artifacts" # Optional: specify where to store artifacts for this experiment
 
     if mlflow.get_experiment_by_name(experiment_name) is None:
         mlflow.create_experiment(experiment_name, artifact_location=artifact_location)

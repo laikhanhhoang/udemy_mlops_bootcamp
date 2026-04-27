@@ -1,7 +1,5 @@
 .venv/
-mlruns/
-data/
-artifacts/
+local_srv_storage/
 
 
 mlflow.db
