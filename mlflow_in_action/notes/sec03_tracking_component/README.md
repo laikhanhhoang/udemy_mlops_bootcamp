@@ -18,8 +18,9 @@
     | **Tags** | `run_id` (FK) | `key`, `value` | Các nhãn thông tin bổ sung (tên model, loại dataset). |
     | **Artifacts** | `run_id` (FK) | `artifact_path`, `file_type`, `location` | Quản lý các file vật lý (file .pkl, ảnh đồ thị) được lưu trữ. |
 
+<br>
 <div align="center">
-    <img src="imgs/mlrun_a_db_demo.png" width=1000>
+    <img src="sec03_mlrun_a_db_demo.png" width=1000>
     <br>
     <i>Demo folder mlruns/ và mlflow.db</i>
 </div>
