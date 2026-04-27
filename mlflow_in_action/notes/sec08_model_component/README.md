@@ -16,6 +16,7 @@
     <i>Demo folder <b><code>&lt;artifact_location&gt;/&lt;run_id&gt;/artifacts/model/</code></b></i>
 </div>
 
+---
 ## 1. Tổng quan về Model Component
 
 MLflow Model là một định dạng chuẩn hóa để đóng gói các mô hình Machine Learning giúp chúng có thể tái sử dụng trong nhiều công cụ hạ tầng khác nhau (Docker, Spark, Cloud Serving).
