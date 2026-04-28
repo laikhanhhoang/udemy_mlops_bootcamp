@@ -15,11 +15,11 @@ Hướng dẫn quản lý và đóng gói mô hình tùy chỉnh (Custom Models)
     | **Windows Path** | Khi `load_model` bằng đường dẫn tuyệt đối, hãy dùng `.as_uri()` để tránh lỗi `d:` scheme. |
 
 - Sơ đồ tư duy quá trình Load Model (xem kĩ hơn [Workflow](#2-luồng-hoạt-động-workflow-khi-load-model)):
-    1. **Download Artifacts** (Về thư mục tạm)
-    2. **Inject `code/` vào sys.path** (Ưu tiên nạp code tùy chỉnh)
-    3. **Map Context** (Ánh xạ Key -> Path tuyệt đối tại máy local)
-    4. **Init Wrapper** (Khởi tạo Class & chạy `load_context`)
-    5. **Ready** (Model đã sẵn sàng nhận `.predict()`)
+    1. **Download Artifacts** (Về thư mục tạm).
+    2. **Inject `code/` từ thư mục tạm vào sys.path** (Ưu tiên nạp code tùy chỉnh).
+    3. **Map Context** (Ánh xạ Key -> Path tuyệt đối tại máy local).
+    4. **Init Wrapper** (Khởi tạo Class & chạy `load_context`).
+    5. **Ready** (Model đã sẵn sàng nhận `.predict()`).
 
 ---
 
