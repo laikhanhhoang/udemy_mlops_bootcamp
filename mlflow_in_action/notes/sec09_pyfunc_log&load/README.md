@@ -17,7 +17,7 @@ Hướng dẫn quản lý và đóng gói mô hình tùy chỉnh (Custom Models)
 - Sơ đồ tư duy quá trình Load Model (xem kĩ hơn [Workflow](#2-luồng-hoạt-động-workflow-khi-load-model)):
     1. **Download Artifacts** (Về thư mục tạm).
     2. **Inject `code/` từ thư mục tạm vào sys.path** (Ưu tiên nạp code tùy chỉnh).
-    3. **Map Context** (Ánh xạ Key $\rightarrow$ Path tuyệt đối của thư mục tạm tại máy local).
+    3. **Map Context** (Ánh xạ context $\rightarrow$ Path tuyệt đối của thư mục tạm tại máy local).
     4. **Init Wrapper** (Khởi tạo Class & chạy `load_context`).
     5. **Ready** (Model đã sẵn sàng nhận `.predict()`).
 
