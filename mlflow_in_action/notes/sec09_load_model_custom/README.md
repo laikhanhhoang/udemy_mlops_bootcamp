@@ -60,7 +60,7 @@ Xem kĩ hơn trên [mlflow.org/mlflow.pyfunc.log_mode](https://mlflow.org/docs/l
 
     1. **Download & Extract** (Mặt vật lý)
 
-        MLflow **tải toàn bộ thư mục model từ Server về một thư mục tạm ngẫu nhiên** trên máy local (ZBook).
+        MLflow **tải toàn bộ thư mục `model` (model_pyfunc/) từ Server về một thư mục tạm ngẫu nhiên** trên máy local (ZBook).
 
         -   **Path trên Server:** `<artifact_location>/<run_id>/artifacts/model_pyfunc/`
         -   **Path thư mục tạm (Local):** `C:/Users/Admin/AppData/Local/Temp/tmp_xyz123/` (Gọi tắt là `<TEMP_DIR>`)
