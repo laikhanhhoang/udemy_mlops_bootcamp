@@ -2,9 +2,7 @@ import os
 from pathlib import Path
 from contextlib import nullcontext
 
-import warnings
-import argparse
-import logging
+import warnings, argparse, logging, joblib
 import pandas as pd
 import numpy as np
 from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score
@@ -13,6 +11,19 @@ from sklearn.linear_model import ElasticNet
 import mlflow
 import mlflow.sklearn
 from mlflow.models.signature import infer_signature
+
+
+# =====================================================================
+# !!!!
+
+# THIS EXPERIMENT ASSUMES THAT SKLEARN IS NOT SUPPORTED BY THE CURRENT MLFLOW VERSION, 
+# THEREFORE WE WILL LOG THE MODEL USING mlflow.pyfunc (Generic Python Model) INSTEAD OF mlflow.sklearn
+
+# Most changes will be in the "4. LOG MODEL (Save Model Object & Metadata)" (you can search it) section, 
+# where we will define a custom PythonModel wrapper to load and use the sklearn model, and log it using mlflow.pyfunc.log_model() instead of mlflow.sklearn.log_model()
+
+# !!!
+# =====================================================================
 
 logging.basicConfig(level=logging.WARN)
 logger = logging.getLogger(__name__)
@@ -86,16 +97,48 @@ def train_and_log_mlflow(alpha_list, l1_list, train_x, train_y, test_x, test_y, 
                         # 4. LOG MODEL (Save Model Object & Metadata)
                         # =====================================================================
                         # Infer the model signature (input and output schema)
+
+                        # Define the artifact path within the run's artifact storage where the model will be saved
+                        artifact_path = "model_pyfunc"
+
+                        # Define a custom PythonModel wrapper to load and use the sklearn model
+                        class SklearnWrapper(mlflow.pyfunc.PythonModel):
+                            def load_context(self, context):
+                                self.sklearn_model = joblib.load(context.artifacts["sklearn_model"])
+
+                            def predict(self, context, model_input):
+                                return self.sklearn_model.predict(model_input.values)
+
+                        # Save the sklearn model to a file and prepare artifacts for logging
+                        sklearn_model_path = "weights/elasticnet_sklearn.pkl"
+                        folder = os.path.dirname(sklearn_model_path)
+                        if not os.path.exists(folder):
+                            os.makedirs(folder)
+                        joblib.dump(lr, sklearn_model_path)
+
+                        data_dir = "data/"
+                        artifacts = {
+                            "sklearn_model" : sklearn_model_path,
+                            "data" : data_dir
+                        }
+
+                        # Define code dependencies, pip requirements, model signature, input example, and metadata for the MLflow Model
+                        code_paths = ["exp_sklearn_pyfunc.py"] # Include the current script as part of the model's code dependencies
+                        pip_requirements = r"D:/UDEMY/mlops_bc/mlflow_in_action/mlflow_demo/src/requirements.txt"
                         signature = infer_signature(train_x, lr.predict(train_x))
-                        
-                        mlflow.sklearn.log_model(
-                            sk_model=lr,
-                            artifact_path="model", # or "model_v1",.. wtever - Destination folder name within artifacts
-                            serialization_format="cloudpickle",
+                        input_example = train_x.head(5)
+                        metadata = {"rmse": float(rmse), "mae": float(mae), "r2": float(r2)}
+
+                        mlflow.pyfunc.log_model(
+                            artifact_path=artifact_path,
+                            python_model=SklearnWrapper(),
+                            artifacts=artifacts,
+                            code_path=code_paths,
+                            pip_requirements=pip_requirements,
                             signature=signature,
-                            input_example=train_x[:5]
+                            input_example=input_example,
+                            metadata=metadata
                         )
-                        print(f"Signature of the model: {signature}")
 
                         # =====================================================================
                         # 5. LOG ARTIFACTS (External Files and Directories)

@@ -3,5 +3,5 @@
 local_srv_storage/mlruns/*
 !local_srv_storage/mlruns/.gitkeep
 
-local_srv_storage/artifacts/*
-!local_srv_storage/artifacts/.gitkeep
+local_srv_storage/myartifacts/*
+!local_srv_storage/myartifacts/.gitkeep
