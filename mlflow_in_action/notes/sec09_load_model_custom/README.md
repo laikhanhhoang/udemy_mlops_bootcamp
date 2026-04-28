@@ -117,3 +117,11 @@ mlflow.pyfunc.log_model(
     metadata=metadata
 )
 ```
+
+
+<br>
+<div align="center">
+    <img src="sec09_pyfunc_logmodel_demo.png" width=400>
+    <br>
+    <i>Demo folder <b><code>&lt;artifact_location&gt;/&lt;run_id&gt;/artifacts/&lt;artifact_path&gt;/</code></b></i>
+</div>
