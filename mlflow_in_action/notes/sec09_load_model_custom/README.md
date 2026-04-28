@@ -49,13 +49,51 @@ Khi gọi `mlflow.pyfunc.load_model()`, MLflow thực hiện quy trình 5 bướ
 
 
 
-1.  **Download & Extract (Vật lý):** **Tải toàn bộ Artifacts** về một thư mục tạm (`/tmp` hoặc `AppData/Local/Temp`).
-2.  **Code Injection (Ưu tiên):** MLflow thêm thư mục `code/` vào đầu danh sách tìm kiếm của Python (`sys.path.insert(0, ...)`). Điều này giúp các lệnh `import` file tùy chỉnh hoạt động ngay lập tức.
-3.  **Context Initialization:** Tạo đối tượng `PythonModelContext`. Nó tự động ánh xạ các **Keys** (tên bạn đặt) với **Đường dẫn tuyệt đối** thực tế trong thư mục tạm.
-4.  **Model Instance & Load Context:** 
-    *   Khởi tạo class Wrapper.
-    *   Gọi hàm `load_context(self, context)`. Lúc này, bạn dùng `context.artifacts["key"]` để lấy đường dẫn file.
-5.  **Ready for Predict:** Trả về đối tượng model đã nạp đủ dữ liệu, sẵn sàng gọi hàm `.predict()`.
+1. **Download & Extract** (Mặt vật lý)
+
+    MLflow tải toàn bộ thư mục model từ Server về một thư mục tạm ngẫu nhiên trên máy local (ZBook).
+
+    -   **Path trên Server:** `mlruns/0/<run_id>/artifacts/model_pyfunc/`
+    -   **Path thư mục tạm (Local):** `C:/Users/Admin/AppData/Local/Temp/tmp_xyz123/` (Gọi tắt là `<TEMP_DIR>`)
+    - Mô phỏng cấu trúc thư mục tạm `<TEMP_DIR>`:
+        ```text
+        <TEMP_DIR>/
+        ├── MLmodel                        <-- File cấu hình YAML của MLflow
+        ├── code/                          <-- (Bước 2) Thư mục được sys.path ưu tiên
+        │   └── exp_sklearn_pyfunc.py
+        ├── artifacts/                     <-- (Bước 3) Nơi context.artifacts trỏ vào
+        │   └── weights/
+        │       └── elasticnet_sklearn.pkl
+        └── python_model.pkl               <-- File binary chứa instance của SklearnWrapper
+        ```
+
+2. **Code Injection** (Ưu tiên nạp mã nguồn)
+
+    MLflow xác định vị trí thư mục `code/` bên trong thư mục tạm và đưa nó vào bộ nhớ tìm kiếm của Python.
+
+    -   **Path của code:** `<TEMP_DIR>/code/`
+    -   **Hành động:** `sys.path.insert(0, "`**`<TEMP_DIR>/code/`**`")`
+    -   **Ý nghĩa:** Mọi file trong **`<TEMP_DIR>/code/`** như `exp_sklearn_pyfunc.py`, có thể được `import` ngay lập tức mà không cần khai báo lại đường dẫn.
+
+3. **Context Initialization** (Ánh xạ Artifacts)
+
+    Tạo **đối tượng context** `PythonModelContext` **lưu đường dẫn thư mục tạm** rồi **ánh xạ các Keys** trong biến `artifacts` của hàm `log_model()` với đường dẫn tuyệt đối mới.
+    - **Ví dụ:** Trong [code bên dưới](#4-code-mẫu-triển-khai) `artifacts = {"sklearn_model" : sklearn_model_path,"data" : data_dir}`, thì: 
+
+        <div align="center">
+
+        `context.artifacts["sklearn_model"]` $\rightarrow$ `<TEMP_DIR>/artifacts/weights/model.pkl`
+
+        </div>
+
+4. Model Instance & Load Context (Kích hoạt Wrapper)
+
+    -   Khởi tạo instance cho class Wrapper (ví dụ: `SklearnWrapper`).
+    -   Gọi hàm `load_context(self, context)`. Lúc này, lệnh `joblib.load(context.artifacts["sklearn_model"])` thực chất là đang load file từ đường dẫn tuyệt đối tại `<TEMP_DIR>`.
+
+5. Ready for Predict
+
+    Hàm trả về đối tượng model đã nạp đủ dữ liệu và logic bổ trợ, sẵn sàng gọi hàm `.predict()`.
 
 ---
 
