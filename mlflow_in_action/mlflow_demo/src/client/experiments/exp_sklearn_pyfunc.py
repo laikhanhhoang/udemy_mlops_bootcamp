@@ -68,50 +68,36 @@ def train_and_log_mlflow(alpha_list, l1_list, train_x, train_y, test_x, test_y, 
                         print(f"ElasticNet model (alpha={alpha}, l1_ratio={l1_ratio}):")
                         print(f"  RMSE: {rmse} | MAE: {mae} | R2: {r2}")
 
-                        # =====================================================================
+                        # --- LOGGING TO MLFLOW ---
                         # 1. LOG PARAMETERS (Input Configurations/Hyperparameters)
-                        # =====================================================================
                         mlflow.log_param("alpha", alpha)
                         mlflow.log_param("l1_ratio", l1_ratio)
-                        
                         # Batch logging alternative: mlflow.log_params({"alpha": alpha, "l1_ratio": l1_ratio})
 
-                        # =====================================================================
                         # 2. LOG METRICS (Output Performance Results)
-                        # =====================================================================
                         mlflow.log_metric("rmse", rmse)
                         mlflow.log_metric("mae", mae)
                         mlflow.log_metric("r2", r2)
-                        
                         # Batch logging alternative: mlflow.log_metrics({"rmse": rmse, "mae": mae, "r2": r2})
 
-                        # =====================================================================
                         # 3. LOG TAGS (Metadata for Search and Filtering)
-                        # =====================================================================
                         mlflow.set_tag("model", "ElasticNet")
                         mlflow.set_tag("dataset", "wine_quality")
-
                         # Batch tagging alternative: mlflow.set_tags({"model": "ElasticNet", "dataset": "wine_quality"})
                         
-                        # =====================================================================
                         # 4. LOG MODEL (Save Model Object & Metadata)
-                        # =====================================================================
-                        # Infer the model signature (input and output schema)
+                        artifact_path = "model_pyfunc" # Define the artifact path within the run's artifact storage where the model will be saved
 
-                        # Define the artifact path within the run's artifact storage where the model will be saved
-                        artifact_path = "model_pyfunc"
-
-                        # Define a custom PythonModel wrapper to load and use the sklearn model
-                        class SklearnWrapper(mlflow.pyfunc.PythonModel):
+                        
+                        class SklearnWrapper(mlflow.pyfunc.PythonModel): # Define a custom PythonModel wrapper to load and use the sklearn model
                             def load_context(self, context):
                                 self.sklearn_model = joblib.load(context.artifacts["sklearn_model"])
 
                             def predict(self, context, model_input):
                                 return self.sklearn_model.predict(model_input.values)
 
-                        # Save the sklearn model to a file and prepare artifacts for logging
-                        sklearn_model_path = "weights/elasticnet_sklearn.pkl"
-                        folder = os.path.dirname(sklearn_model_path)
+                        sklearn_model_path = "weights/elasticnet_sklearn.pkl" # Save the sklearn model to a file and prepare artifacts for logging
+                        folder = os.path.dirname(sklearn_model_path) # Ensure the directory exists before saving the model
                         if not os.path.exists(folder):
                             os.makedirs(folder)
                         joblib.dump(lr, sklearn_model_path)
@@ -122,13 +108,13 @@ def train_and_log_mlflow(alpha_list, l1_list, train_x, train_y, test_x, test_y, 
                             "data" : data_dir
                         }
 
-                        # Define code dependencies, pip requirements, model signature, input example, and metadata for the MLflow Model
-                        code_paths = ["exp_sklearn_pyfunc.py"] # Include the current script as part of the model's code dependencies
-                        pip_requirements = r"D:/UDEMY/mlops_bc/mlflow_in_action/mlflow_demo/src/requirements.txt"
-                        signature = infer_signature(train_x, lr.predict(train_x))
-                        input_example = train_x.head(5)
-                        metadata = {"rmse": float(rmse), "mae": float(mae), "r2": float(r2)}
+                        code_paths = ["exp_sklearn_pyfunc.py"]  # Defile specify code files/folder to be logged with the model
+                        pip_requirements = r"D:/UDEMY/mlops_bc/mlflow_in_action/mlflow_demo/src/requirements.txt"   # Define pip requirements file to specify dependencies needed to run the model (alternative: conda environment file)
+                        signature = infer_signature(train_x, lr.predict(train_x))   # Define model signature (input and output schema) for better model serving and deployment support (optional but recommended)
+                        input_example = train_x.head(5) # Define an input example for the model (optional but recommended for better model understanding and testing in deployment)
+                        metadata = {"rmse": float(rmse), "mae": float(mae), "r2": float(r2)}    # Define custom metadata to be logged with the model (optional, can include any relevant information about the model or training process)
 
+                        # Log the model using mlflow.pyfunc.log_model() with the defined wrapper, artifacts, code paths, dependencies, signature, input example, and metadata
                         mlflow.pyfunc.log_model(
                             artifact_path=artifact_path,
                             python_model=SklearnWrapper(),
@@ -140,24 +126,17 @@ def train_and_log_mlflow(alpha_list, l1_list, train_x, train_y, test_x, test_y, 
                             metadata=metadata
                         )
 
-                        # =====================================================================
                         # 5. LOG ARTIFACTS (External Files and Directories)
-                        # =====================================================================
-                        # Log a single file
-                        mlflow.log_artifact("wine_quality.csv")
+                        mlflow.log_artifact("wine_quality.csv") # Log a single file
 
-                        # Log an entire directory to a specific path in MLflow
-                        mlflow.log_artifacts("data/", artifact_path="data_used")
+                        mlflow.log_artifacts("data/", artifact_path="data_used") # Log an entire directory to a specific path in MLflow
 
-                        # =====================================================================
                         # 6. RUN RETRIEVAL (Query current run information)
-                        # =====================================================================
                         # Get information about the currently active run
                         run = mlflow.active_run()
                         print(f"Run ID: {run.info.run_id}")
                         print(f"Run name: {run.info.run_name}")
                         print(f"Artifact URI: {mlflow.get_artifact_uri()}")
-
                         # Or you can access run's info after ending the run:
                             # mlflow.end_run() 
                             # run = mlflow.last_active_run()

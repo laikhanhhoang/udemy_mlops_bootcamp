@@ -57,34 +57,23 @@ def train_and_log_mlflow(alpha_list, l1_list, train_x, train_y, test_x, test_y, 
                         print(f"ElasticNet model (alpha={alpha}, l1_ratio={l1_ratio}):")
                         print(f"  RMSE: {rmse} | MAE: {mae} | R2: {r2}")
 
-                        # =====================================================================
                         # 1. LOG PARAMETERS (Input Configurations/Hyperparameters)
-                        # =====================================================================
                         mlflow.log_param("alpha", alpha)
                         mlflow.log_param("l1_ratio", l1_ratio)
-                        
                         # Batch logging alternative: mlflow.log_params({"alpha": alpha, "l1_ratio": l1_ratio})
 
-                        # =====================================================================
                         # 2. LOG METRICS (Output Performance Results)
-                        # =====================================================================
                         mlflow.log_metric("rmse", rmse)
                         mlflow.log_metric("mae", mae)
                         mlflow.log_metric("r2", r2)
-                        
                         # Batch logging alternative: mlflow.log_metrics({"rmse": rmse, "mae": mae, "r2": r2})
 
-                        # =====================================================================
                         # 3. LOG TAGS (Metadata for Search and Filtering)
-                        # =====================================================================
                         mlflow.set_tag("model", "ElasticNet")
                         mlflow.set_tag("dataset", "wine_quality")
-
                         # Batch tagging alternative: mlflow.set_tags({"model": "ElasticNet", "dataset": "wine_quality"})
                         
-                        # =====================================================================
                         # 4. LOG MODEL (Save Model Object & Metadata)
-                        # =====================================================================
                         # Infer the model signature (input and output schema)
                         signature = infer_signature(train_x, lr.predict(train_x))
                         
@@ -97,24 +86,16 @@ def train_and_log_mlflow(alpha_list, l1_list, train_x, train_y, test_x, test_y, 
                         )
                         print(f"Signature of the model: {signature}")
 
-                        # =====================================================================
                         # 5. LOG ARTIFACTS (External Files and Directories)
-                        # =====================================================================
-                        # Log a single file
-                        mlflow.log_artifact("wine_quality.csv")
+                        mlflow.log_artifact("wine_quality.csv") # Log a single file
+                        mlflow.log_artifacts("data/", artifact_path="data_used") # Log an entire directory to a specific path in MLflow
 
-                        # Log an entire directory to a specific path in MLflow
-                        mlflow.log_artifacts("data/", artifact_path="data_used")
-
-                        # =====================================================================
                         # 6. RUN RETRIEVAL (Query current run information)
-                        # =====================================================================
                         # Get information about the currently active run
                         run = mlflow.active_run()
                         print(f"Run ID: {run.info.run_id}")
                         print(f"Run name: {run.info.run_name}")
                         print(f"Artifact URI: {mlflow.get_artifact_uri()}")
-
                         # Or you can access run's info after ending the run:
                             # mlflow.end_run() 
                             # run = mlflow.last_active_run()

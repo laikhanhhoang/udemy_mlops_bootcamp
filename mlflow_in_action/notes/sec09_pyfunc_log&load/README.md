@@ -29,15 +29,15 @@ Hướng dẫn quản lý và đóng gói mô hình tùy chỉnh (Custom Models)
 Hàm này đóng vai trò "đóng gói" mô hình thành một định dạng vạn năng (Generic Model), cho phép triển khai trên Docker, Kubernetes hoặc Spark mà không cần phụ thuộc vào code framework gốc.
 
 ### Các tham số quan trọng:
-| Tham số | Kiểu dữ liệu | Mô tả |
-| :--- | :--- | :--- |
-| **artifact_path** | `str` | Tên thư mục lưu trữ model trong Run (ví dụ: `"model_pyfunc"`). |
-| **python_model** | `Instance` | Một instance của class kế thừa từ `mlflow.pyfunc.PythonModel`. |
-| **artifacts** | `dict` | Dictionary ánh xạ tên với đường dẫn file tĩnh (weights, configs, data). |
-| **code_path** | `list` | Danh sách đường dẫn đến các file Python bổ trợ hoặc thư viện custom. |
-| **pip_requirements** | `str`/`list` | Đường dẫn file `requirements.txt` hoặc danh sách các thư viện cần thiết. |
-| **signature** | `ModelSignature` | Định nghĩa kiểu dữ liệu đầu vào và đầu ra của model. |
-| **metadata** | `dict` | Các thông tin bổ sung (ví dụ: `{"rmse": 0.79}`). |
+| Tham số | Kiểu dữ liệu | Mô tả | Ví dụ |
+| :--- | :--- | :--- | :--- |
+| **artifact_path** | `str` | **Tên thư mục lưu trữ model** trong Run. | `artifact_path="model_pyfunc"` |
+| **python_model** | `Instance` | Một instance của **Wrapper class** (kế thừa `PythonModel`). | `python_model=SklearnWrapper()` |
+| **artifacts** | `dict` | Dictionary **ánh xạ tên với đường dẫn** file/folder tĩnh. | `artifacts={"weights": "weights/model.pkl", "data":"data/"}` |
+| **code_path** | `list` | Danh sách đường dẫn đến các **file/folder code bổ trợ**. | `code_path=["utils.py", "features.py, "src/"]` |
+| **pip_requirements** | `str`/`list` | File `requirements.txt` hoặc **list thư viện** cần thiết. | `pip_requirements=["pandas", "joblib", ".../requirements.txt"]` |
+| **signature** | `ModelSignature` | Định nghĩa **Schema** đầu vào và đầu ra của model. | `signature=infer_signature(X, y_pred)` |
+| **metadata** | `dict` | Các **thông tin bổ sung** (phải ép kiểu Python gốc). | `metadata={"rmse": float(rmse)}` |
 
 Xem kĩ hơn trên [mlflow.org/mlflow.pyfunc.log_mode](https://mlflow.org/docs/latest/api_reference/python_api/mlflow.pyfunc.html#mlflow.pyfunc.log_model).
 
@@ -50,7 +50,8 @@ Xem kĩ hơn trên [mlflow.org/mlflow.pyfunc.log_mode](https://mlflow.org/docs/l
     <div align="center">
         <i>Demo folder <b>log_model()</b>: <b><code>artifacts/model_pyfunc/</code></b> trên server</i>
         <br>
-        <img src="sec09_pyfunc_logmodel_demo.png" width=400>
+        <img src="sec09_pyfunc_logmodel_demo.png" width=300>
+        <br>
     </div>
 
 
@@ -168,7 +169,7 @@ mlflow.pyfunc.log_model(
 
 <br>
 <div align="center">
-    <img src="sec09_pyfunc_logmodel_demo.png" width=400>
-    <br>
     <i>Demo folder <b><code>&lt;artifact_location&gt;/&lt;run_id&gt;/artifacts/&lt;artifact_path&gt;/</code></b></i>
+    <br>
+    <img src="sec09_pyfunc_logmodel_demo.png" width=300>
 </div>
