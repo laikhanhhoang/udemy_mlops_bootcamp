@@ -1,15 +1,34 @@
-# Sec09: MLflow Model Evaluation
+# Sec10: MLflow Model Evaluation
+Hướng dẫn evaluate mô hình bằng **`mlflow.evaluate()`**, chủ yếu làm việc với file [exp_sklearn_pyfunc.py](/mlflow_in_action/mlflow_demo/src/client/model/mlflow_evaluate.py).
 
-## Tóm tắt
-*   **Mục tiêu**: Đánh giá hiệu năng model trước khi deploy bằng cách sử dụng `mlflow.evaluate()`.
-*   **Tự động hóa**: Tự động tính toán bộ Metrics chuẩn (RMSE, MAE, Accuracy, F1...) tùy theo **model_type**.
-*   **Giải thích (Explainability)**: Tích hợp thư viện **SHAP** để tạo biểu đồ Feature Importance và Model Summary.
-*   **Linh hoạt**: Hỗ trợ đánh giá trực tiếp từ URI model hoặc từ tập dữ liệu tĩnh (Static Dataset).
-*   **Customization**: Cho phép định nghĩa thêm **extra_metrics** và **custom_artifacts** (biểu đồ riêng).
-*   **Lineage**: Tự động log thông tin Dataset (hash, path) vào tag `mlflow.datasets` để truy vết.
-*   **Hỗ trợ đa dạng**: Tương thích Regressor, Classifier, LLMs (QA, Summarization, Text), Retriever.
-*   **Ví dụ**: So sánh hiệu năng của mô hình ElasticNet trên tập Test sau khi đã train xong.
+## Tóm tắt 
 
+*   **Tự động hóa luồng dữ liệu:** Chuyển đổi dữ liệu kiểm thử thành `eval_df` (Target vs Prediction) để làm đầu vào cho mọi tính toán.
+*   **Khởi tạo linh hoạt:** Hỗ trợ load model qua môi trường `local` hoặc cô lập (`conda/virtualenv`) tùy thuộc vào cấu hình `env_manager`.
+*   **Cơ chế Inject Metric:** Cho phép "bơm" các chỉ số mặc định (`_builtin_metrics`) vào hàm custom để tái sử dụng logic tính toán.
+*   **Phân loại lưu trữ:** Tách biệt kết quả thành **Metrics** (giá trị số) và **Artifacts** (biểu đồ/file) dựa trên kiểu dữ liệu trả về của hàm.
+*   **Tùy biến Artifacts:** Cho phép lưu file vật lý qua `artifacts_dir` hoặc trả về đối tượng bộ nhớ, hỗ trợ cấu hình thư mục con qua Key.
+*   **Hệ quy chiếu Baseline:** Tự động tính toán sự chênh lệch (Delta) giữa mô hình ứng viên và mô hình chuẩn để đánh giá cải tiến.
+*   **Chốt chặn Validation:** Sử dụng `validation_thresholds` làm cổng kiểm soát chất lượng, tự động báo lỗi nếu model không đạt ngưỡng.
+*   **Trực quan hóa tập trung:** Tất cả chỉ số phụ, biểu đồ custom và trạng thái kiểm duyệt đều hiển thị đồng nhất trên giao diện MLflow UI.
+
+```python
+with mlflow.start_run(run_id = args.model_run_id) as run:
+    evaluate_results = mlflow.evaluate(
+        model               = model_uri,
+        data                = data,           
+        targets             = "quality",
+        model_type          = "regressor",
+        evaluators          = ["default"],
+        extra_metrics       = [
+            squared_diff_plus_one_metric,
+            sum_on_target_divided_by_two_metric
+        ],
+        custom_artifacts    = [prediction_target_scatter], 
+        validation_thresholds   = thresholds,
+        baseline_model          = baseline_uri
+    )
+```
 ---
 
 ## 1. Luồng hoạt động của mlflow.evaluate()
