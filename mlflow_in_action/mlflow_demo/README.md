@@ -23,6 +23,15 @@ cd ./src/client
         # or python exp_elasticnet_gridsearch.py --nested
     ```
 
+- **src/client/model**
+
+    ```bash
+    cd model # Just to make sure you are on folder model
+
+
+    python mlflow_evaluate.py --model_run_id [str] --baseline_run_id [str]/None
+    ```
+
 ## 3. Setup local MLFlow tracking server in **`src/local_srv_storage`**
 
 ```bash
