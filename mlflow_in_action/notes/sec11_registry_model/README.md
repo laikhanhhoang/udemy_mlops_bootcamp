@@ -58,8 +58,9 @@ MLflow cung cấp 3 trạng thái mặc định để quản lý luồng triển
     - Khi một Model URI được đăng ký vào tên đã có, hệ thống tạo bản ghi Metadata mới.
     - **Hành động hệ thống:** Map Run ID $\rightarrow$ Model Name $\rightarrow$ Version N.
     - **Mặt vật lý:** Path lưu Artifact từ Run được ánh xạ vào thư mục của Registry.
-<div align="center"> `mlflow-artifacts:/123/model` $\rightarrow$ `models:/Plate_Reg/1` </div>
 
+    <div align="center"> <code>mlflow-artifacts:/123/model</code> &rarr; <code>models:/Plate_Reg/1</code> </div>
+    
 2. **Chuyển đổi sang Production:**
     - Thông thường, mỗi Stage nên giữ **01 Model duy nhất** để tránh xung đột logic của Client.
     - **Xử lý tiến trình cũ (Old Process):** Nếu không gỡ model cũ, các process đã load model đó vào RAM vẫn chạy bản cũ cho đến khi khởi động lại. Các process mới sẽ nhận model mới nhất của Stage đó.
